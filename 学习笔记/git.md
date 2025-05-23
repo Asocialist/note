@@ -35,3 +35,22 @@
 - 合并分支 `git merge`
 
   - 在master上输入合并命令 并且加上 --no--ff参数
+  `git merge --no--ff feature`
+
+  - 保存编辑器中内容并关闭
+
+- 图表显示日志分支 `git log --graph`
+
+## 更改提交的操作
+
+- 回溯版本 `git reset`
+  
+  1. `git rest --hard` 提供目标时间点的哈希值
+  2. `git reflog`查看操作时间哈希值
+  3. 消除冲突
+     在master上`git merge --no--ff feature`在编辑器中修改并保存
+
+  4. 提交 执行`git add` `git commit`
+     `git commit --amend`来启动编辑器修改提交信息
+
+- 压缩历史 `git rebase -i`
