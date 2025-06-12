@@ -13,7 +13,7 @@
 - 添加文件 `git add`
 
 - 保存仓库记录 `git commit -m ""`
-
+- 上传master分支上所有内容`git push -u respositories master`
 - 查看日志 `git log`
 
   - `git log -p` 查看提交前后差异

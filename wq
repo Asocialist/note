@@ -1,0 +1,39 @@
+[1mdiff --git a/Deedy-Resume-for-Japanese b/Deedy-Resume-for-Japanese[m
+[1mdeleted file mode 160000[m
+[1mindex f6b8c21..0000000[m
+[1m--- a/Deedy-Resume-for-Japanese[m
+[1m+++ /dev/null[m
+[36m@@ -1 +0,0 @@[m
+[31m-Subproject commit f6b8c21642d52b5e3493ec2e71846ae42190f8d1[m
+[1mdiff --git a/HowToCook b/HowToCook[m
+[1mdeleted file mode 160000[m
+[1mindex e2e8cd1..0000000[m
+[1m--- a/HowToCook[m
+[1m+++ /dev/null[m
+[36m@@ -1 +0,0 @@[m
+[31m-Subproject commit e2e8cd10dbab70a937ec72640f09db169aafd2f2[m
+[1mdiff --git a/othersbook/leetcode-master b/othersbook/leetcode-master[m
+[1m--- a/othersbook/leetcode-master[m
+[1m+++ b/othersbook/leetcode-master[m
+[36m@@ -1 +1 @@[m
+[31m-Subproject commit 2b0ca4659803199c09f44fe18c8d2763e92bb779[m
+[32m+[m[32mSubproject commit 2b0ca4659803199c09f44fe18c8d2763e92bb779-dirty[m
+[1mdiff --git a/othersbook/second_brain b/othersbook/second_brain[m
+[1m--- a/othersbook/second_brain[m
+[1m+++ b/othersbook/second_brain[m
+[36m@@ -1 +1 @@[m
+[31m-Subproject commit f3202f2456b12a9486570a31e93a1698bf01402f[m
+[32m+[m[32mSubproject commit f3202f2456b12a9486570a31e93a1698bf01402f-dirty[m
+[1mdiff --git a/学习笔记/git.md b/学习笔记/git.md[m
+[1mindex 6768ded..653f378 100644[m
+[1m--- a/学习笔记/git.md[m
+[1m+++ b/学习笔记/git.md[m
+[36m@@ -13,7 +13,7 @@[m
+ - 添加文件 `git add`[m
+ [m
+ - 保存仓库记录 `git commit -m ""`[m
+[31m-[m
+[32m+[m[32m- 上传master分支上所有内容`git push -u respositories master`[m
+ - 查看日志 `git log`[m
+ [m
+   - `git log -p` 查看提交前后差异[m
