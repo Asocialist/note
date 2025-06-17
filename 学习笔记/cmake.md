@@ -55,3 +55,10 @@
 
 - 定义变量：`set(MY_VAR "HelloWorld")`
 - 使用: `message(STATUS "Variable MY_VAR is ${MY_VAR}")`
+- 缓存变量+缓存变量存储在 CMake 的缓存文件中，用户可以在 CMake 配置时修改这些值。缓存变量通常用于用户输入的设置，例如编译选项和路径。
+- 定义缓存变量`set(MY_CACHE_VAR "DefaultValue" CACHE STRING "A cache variable")`
+- 使用缓存变量：`message(STATUS "Cache variable MY_CACHE_VAR is ${MY_CACHE_VAR}")`
+
+## 查找包和库
+
+- `find package(Boost REQUIRED)`
