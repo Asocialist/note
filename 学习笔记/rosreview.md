@@ -137,3 +137,68 @@
   
       - int float string time duration 其他msg
       - variable-length array[] fixed-length array[C]
+
+    - 特殊类型Header案由时间戳和ros中广泛使用的坐标帧信息一般在msg文件第一行看到Header header
+    - srv文件与msg文件一样知识包含两个部分请求和相应通过---线隔开
+
+    ```srv
+    int64 A
+    int64 B
+    ---
+    int64 Sum
+    ```
+
+    - A和B是请求 Sum是响应
+
+ 1. 使用msg
+
+    - 创建一个filename.msg元素每行一个
+    - 需要确保能够转换为C++ python等其他语言的source code
+    - 打开package.xml确保由一下内容
+
+    ```xml
+    <build_depend>message_generation</build_depend>
+    <exec_depend>message_runtime</exec_depend>
+    ```
+
+    - 打开CMakeLists.txt 在find_package()中添加message_generation依赖项
+    - 确保导出消息运行时的依赖
+
+    ```txt
+    catkin_package(
+      CATKIN_DEPENDS message_runtime ...
+    )
+    ```
+
+    ```txt
+    add_message_files(
+      FILES
+      filename.msg
+    )
+    ```
+
+    - 确保这部分不是注释。手动添加.msg之后要确保Cmake合适需要重新配置项目。确保generate_message()函数被调用
+
+    ```txt
+    generate_messages(
+      DEPENDENCIES
+      std_msgs
+    )
+    ```
+
+    - 使用rosmsg
+      - `rosmsg show [message type]`来查看ros是否能够识别
+      - message type 由定义消息的软件包 和消息名称组成
+
+ 1. 使用srv
+
+    - 创建srv 从另一个包赋值现有的srv定义
+    - `roscp [packagename] [file_to_copy_path] [copy_path]` 同样需要确保可以被转换成别的语言的源码
+    - 同样需要在package.xml中修改服务字段
+
+    ```xml
+    add_service_files(
+      FILES
+      filename.srv
+    )
+    ```
