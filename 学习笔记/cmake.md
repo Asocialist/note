@@ -61,4 +61,46 @@
 
 ## 查找包和库
 
-- `find package(Boost REQUIRED)`
+- `find package(Boost REQUIRED)`自动检测和配置外部库和包
+
+  - `find_package(OpenCV REQUIRED PATHS /path/to/opencv)` 查找库并指定路径
+  - `target_link_libraries(MyExecutable Boost::Boost)`使用查找到的库
+  - `include_directories($}{Boost_INCLUDE_DIRS})`
+
+    `link_directories(${Boost_LIBRARY_DIRS})`设置包含目录和链接目录 不推荐使用
+  - 例:
+
+    ```cmake
+    cmake_minimum_required(VERSION 3.10)
+    project(OpenCVManual)
+
+    # 添加头文件路径
+
+    include_directories("C:/libs/opencv/opencv4/opencv")
+
+    # 添加库文件路径
+
+    link_directories("C:/libs/opencv/x64/vc16/lib")
+
+    # 添加可执行文件
+
+    add_executable(MyApp main.cpp)
+
+    # 链接库（举例几个模块）
+
+    target_link_libraries(MyApp
+    opencv_core470.lib
+    opencv_imgproc470.lib
+    opencv_highgui470.lib
+    )
+    ```
+
+## 常见构建流程
+
+1. 创建构建目录 将构建文件放在source code 之外
+1. 运行cmake `cmake ..` 指定生成器`cmake -G ""`
+
+   `cmake -DCMAKE_BUILD_TYPE=Release ..`指定构建类型
+1. 使用Makefile 进行构建`make`
+1. 清理构建文件 `make clean` `rm -rf build/*`
+1. 修改Cmakelist.txt 和项目文件需要重新构建编译

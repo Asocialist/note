@@ -4,12 +4,12 @@
 
   - ANSWER  
 
-       非負性 
+       非負性
      $$ f_r \geq 0 \Rightarrow \frac{\rho_d}{\pi}\geq 0 $$  
 
     エネルギー
     $$
-    \int_\Omega f_r(w_i,w_o) cos (\theta) d w_i\leq 1 
+    \int_\Omega f_r(w_i,w_o) cos (\theta) d w_i\leq 1
     $$  
     つまり
     $$
