@@ -89,3 +89,32 @@
 
 ### linux 安全权限
 
+- Linux安全性 解读文件权限 使用 Linux组
+
+  1. 安全性
+
+     - /etc/passwd文件
+     - /etc/shadow文件
+     - useradd 添加新用户 设置在/etc/default/useradd中
+     - userdel 删除用户 userdel -r使用时要注意检查
+     - usermod 修改用户 -l 修改用户名 -L锁定使其无法等陆 -p更改密码 -U解除锁定
+
+  1. 使用Linux组
+     - 组(group)允许多个用户对系统中的对象共享一组共用的权限。
+     - /etc/group文件 包含组名 组密码 GID 用户列表
+     - 创建组 groupadd
+
+  1. 文件权限
+
+     - ls -l 显示的各个参数主要的
+        - __x__ 代表可执行 __w__ 可写 __r__ 代表可读默认666(八进制)
+     - chmod 改变相应权限
+
+## 文件系统
+
+1. 基本文件系统
+  
+   - ext和ext2文件系统 ext3 ext4 reiser JFS等
+1. 操作文件系统
+
+   - fdisk /dev/sdb fdsik工具通过输入指令逐步完成分区

@@ -192,7 +192,7 @@
 
  1. 使用srv
 
-    - 创建srv 从另一个包赋值现有的srv定义
+    - 创建srv 从另一个包赋值现有的srv定义 `mkdir srv`
     - `roscp [packagename] [file_to_copy_path] [copy_path]` 同样需要确保可以被转换成别的语言的源码
     - 同样需要在package.xml中修改服务字段
 
@@ -202,3 +202,8 @@
       filename.srv
     )
     ```
+
+ 1. ros工具获取帮助 `rosmsg -h` `rosmsg show -h`
+
+## ros创建node cpp实现
+
