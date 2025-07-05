@@ -293,3 +293,125 @@ class <派生类名>:<继承方式1><基类名1>,<继承方式2><基类名2>,…
 ```
 
 - 访问修饰符继承方式是 public、protected 或 private 其中的一个，用来修饰每个基类，各个基类之间用逗号分隔
+
+### *重载运算符和重载函数*
+
+#### 函数重载
+
+- C++允许同一作用域钟的某个函数和运算符指定多个定义,分别为 __函数重载__ 和 __运算符重载__
+  重载声明指的是已经在该作用域内声明过的函数或方法有相同的声明，但是参数列表和定义不同
+- 调用一个重载函数或重载运算时编译器会将使用的参数类型与定义中的参数类型进行比较，选用最合适的定义。这个过程称为 __重载决策__
+- 即在一个作用域中可以声明几个功能类似的同名函数但是这些同名函数的形参必须不同
+
+   ```C++
+  #include<iostream>
+
+    class printData{
+    public:
+    void print(int i) {
+        std::cout << "Integer: " << i << std::endl;
+    }
+    void print(double d) {
+        std::cout << "Double: " << d << std::endl;
+    }
+    void print(const std::string& s) {
+        std::cout << "String: " << s << std::endl;
+        }
+    };  
+    int main() {
+    printData pd;
+    pd.print(42);                // Calls print(int)
+    pd.print(3.14);             // Calls print(double)
+    pd.print("Hello, World!");  // Calls print(const std::string&)
+
+    return 0;
+    }
+
+   ```
+
+#### 运算符重载
+
+- 这个功能实现了自定义运算符
+- 重载的运算符带有特殊名称的函数，函数名是由关键字operator和其后要重载的运算符符号构成 重载运算符需要一个返回类型和参数列表
+`Box operator+(const Box&);`
+- 声明加法运算符将两个Box对象相加，返回最终的Box对象。大多数的重载运算符可被定义为普通的非成员函数或者被定义为类成员函数。如果我们定义上面的函数为类的非成员函数，那么我们需要为每次操作传递两个参数
+`Box operator+(const Box&, const Box&);`
+
+- 通过成员函数演示
+
+   ```C++
+   #include <iostream>
+   using namespace std;
+ 
+    class Box
+    {
+   public:
+ 
+      double getVolume(void)
+      {
+         return length * breadth * height;
+      }
+      void setLength( double len )
+      {
+          length = len;
+      }
+ 
+      void setBreadth( double bre )
+      {
+          breadth = bre;
+      }
+ 
+      void setHeight( double hei )
+      {
+          height = hei;
+      }
+      // 重载 + 运算符，用于把两个 Box 对象相加
+      Box operator+(const Box& b)
+      {
+         Box box;
+         box.length = this->length + b.length;
+         box.breadth = this->breadth + b.breadth;
+         box.height = this->height + b.height;
+         return box;
+      }
+   private:
+      double length;      // 长度
+      double breadth;     // 宽度
+      double height;      // 高度
+    };
+    // 程序的主函数
+    int main( )
+    {
+   Box Box1;                // 声明 Box1，类型为 Box
+   Box Box2;                // 声明 Box2，类型为 Box
+   Box Box3;                // 声明 Box3，类型为 Box
+   double volume = 0.0;     // 把体积存储在该变量中
+ 
+   // Box1 详述
+   Box1.setLength(6.0); 
+   Box1.setBreadth(7.0); 
+   Box1.setHeight(5.0);
+ 
+   // Box2 详述
+   Box2.setLength(12.0); 
+   Box2.setBreadth(13.0); 
+   Box2.setHeight(10.0);
+ 
+   // Box1 的体积
+   volume = Box1.getVolume();
+   cout << "Volume of Box1 : " << volume <<endl;
+ 
+   // Box2 的体积
+   volume = Box2.getVolume();
+   cout << "Volume of Box2 : " << volume <<endl;
+ 
+   // 把两个对象相加，得到 Box3
+   Box3 = Box1 + Box2;
+ 
+   // Box3 的体积
+   volume = Box3.getVolume();
+   cout << "Volume of Box3 : " << volume <<endl;
+ 
+    return 0;
+    }
+   ```
