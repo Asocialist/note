@@ -54,3 +54,5 @@
      `git commit --amend`来启动编辑器修改提交信息
 
 - 压缩历史 `git rebase -i`
+- `gitk --all` 查看版本
+- https://www.toptal.com/developers/gitignore/ 查找需要隐藏的东西 
