@@ -55,4 +55,4 @@
 
 - 压缩历史 `git rebase -i`
 - `gitk --all` 查看版本
-- <https://www.toptal.com/developers/gitignore/> 查找需要隐藏的东西 
+- <https://www.toptal.com/developers/gitignore/> 查找需要隐藏的东西
