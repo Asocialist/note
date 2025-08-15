@@ -206,4 +206,3 @@
  1. ros工具获取帮助 `rosmsg -h` `rosmsg show -h`
 
 ## ros创建node cpp实现
-
