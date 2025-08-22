@@ -553,5 +553,84 @@ int main(int argc, char **argv)
 ## ros创建node python实现
 
 - 同样建立一个publisher节点和一个subscriber节点
-- 代码要放在/packagename/script下
+- 代码要放在/packagename/script下 注意权限的添加
 - 修改CmakeLists.txt
+
+```txt
+catkin_install_python(
+  PROGRAMS
+    scripts/talker.py
+    scripts/listener.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+```
+
+- 将以上代码放入到CmakeLists.txt 这一步是在/bin下安装对应脚本
+
+``` python
+#!/usr/bin/env python
+# license removed for brevity
+import rospy
+from std_msgs.msg import String
+
+def talker():
+    pub = rospy.Publisher('chatter', String, queue_size=10)
+    rospy.init_node('talker', anonymous=True)
+    rate = rospy.Rate(10) # 10hz
+    while not rospy.is_shutdown():
+        hello_str = "hello world %s" % rospy.get_time()
+        rospy.loginfo(hello_str)
+        pub.publish(hello_str)
+        rate.sleep()
+
+if __name__ == '__main__':
+    try:
+        talker()
+    except rospy.ROSInterruptException:
+        pass
+```
+
+- 代码解释：
+
+  - `#!/usr/bin/env python` 确保脚本按照Python脚本执行
+  - `import rospy` `from std_msgs.msg import String`  初始化调用String信息类作为字符串容器发布
+  - `pub = rospy.Publisher('chatter', String, queue_size=10)`定义了publisher对象和话题名String是std_msgs.String类queue_size是为了限制排队的消息数量
+  - `rospy.init_node('talker', anonymous=True)` 规定节点名称 anonymous=True是让名称末尾添加随机数确保节点具有唯一名称
+  - `rate = rospy.Rate(10) # 10hz` 使用sleep方法按照规定速率循环
+  - `while not rospy.is_shutdown():`部分 标准的rospy结构 注意`rospy.loginfo(str)`会将消息打印到屏幕上 将消息写入节点的日志文件 写入rosout(可以通过rqt_console拉取信息查看相关的输出) `pub.publish(str)`广播信息
+  - 发布复杂的消息类型方法
+    - 先引入复杂消息类型 造函数参数的顺序与.msg文件中的顺序相同。也可以不传入任何参数，直接初始化字段`msg = String()` `msg.data = str`
+    - 自定义复杂消息在msg/filename.msg中定义然后在Cmakelists和package.xml文件中声明消息依赖 编译后使用
+
+  - `try:` 的部分 除了标准的Python __main__检查，它还会捕获一个rospy.ROSInterruptException异常，当按下Ctrl+C或节点因其他原因关闭时，这一异常就会被rospy.sleep()和rospy.Rate.sleep()抛出。引发此异常的原因是你不会意外地在sleep()之后继续执行代码。
+
+``` python
+#!/usr/bin/env python
+import rospy
+from std_msgs.msg import String
+
+def callback(data):
+    rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
+    
+def listener():
+
+    # In ROS, nodes are uniquely named. If two nodes with the same
+    # name are launched, the previous one is kicked off. The
+    # anonymous=True flag means that rospy will choose a unique
+    # name for our 'listener' node so that multiple listeners can
+    # run simultaneously.
+    rospy.init_node('listener', anonymous=True)
+
+    rospy.Subscriber("chatter", String, callback)
+
+    # spin() simply keeps python from exiting until this node is stopped
+    rospy.spin()
+
+if __name__ == '__main__':
+    listener()
+```
+
+- 解释:
+
+  - `rospy.spin()` 引入新的回调机制与roscpp不同rospy.spin()不影响订阅者回调函数有自己的线程
+- 记得`source ~/workspacename/devel/setup.bash`
