@@ -549,3 +549,9 @@ int main(int argc, char **argv)
 - chatterCallback函数是一个回调函数当有新消息到达chatter话题时它就会被调用。
 - `ros::Subscriber sub = n.subscribe("chatter", 1000, chatterCallback);`跟publisher一样建立一个subcriber 对象名为sub订阅chatter话题
 - `ros::spin();`启动一个自循环来不断调用回调函数
+
+## ros创建node python实现
+
+- 同样建立一个publisher节点和一个subscriber节点
+- 代码要放在/packagename/script下
+- 修改CmakeLists.txt
