@@ -145,7 +145,7 @@
       - variable-length array[] fixed-length array[C]
 
     - 特殊类型Header案由时间戳和ros中广泛使用的坐标帧信息一般在msg文件第一行看到Header header
-    - srv文件与msg文件一样知识包含两个部分请求和相应通过---线隔开
+    - srv文件与msg文件一样只是包含两个部分请求和相应通过---线隔开
 
     ```srv
     int64 A
@@ -553,5 +553,268 @@ int main(int argc, char **argv)
 ## ros创建node python实现
 
 - 同样建立一个publisher节点和一个subscriber节点
-- 代码要放在/packagename/script下
+- 代码要放在/packagename/script下 注意权限的添加
 - 修改CmakeLists.txt
+
+```txt
+catkin_install_python(
+  PROGRAMS
+    scripts/talker.py
+    scripts/listener.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+```
+
+- 将以上代码放入到CmakeLists.txt 这一步是在/bin下安装对应脚本
+
+``` python
+#!/usr/bin/env python
+# license removed for brevity
+import rospy
+from std_msgs.msg import String
+
+def talker():
+    pub = rospy.Publisher('chatter', String, queue_size=10)
+    rospy.init_node('talker', anonymous=True)
+    rate = rospy.Rate(10) # 10hz
+    while not rospy.is_shutdown():
+        hello_str = "hello world %s" % rospy.get_time()
+        rospy.loginfo(hello_str)
+        pub.publish(hello_str)
+        rate.sleep()
+
+if __name__ == '__main__':
+    try:
+        talker()
+    except rospy.ROSInterruptException:
+        pass
+```
+
+- 代码解释：
+
+  - `#!/usr/bin/env python` 确保脚本按照Python脚本执行
+  - `import rospy` `from std_msgs.msg import String`  初始化调用String信息类作为字符串容器发布
+  - `pub = rospy.Publisher('chatter', String, queue_size=10)`定义了publisher对象和话题名String是std_msgs.String类queue_size是为了限制排队的消息数量
+  - `rospy.init_node('talker', anonymous=True)` 规定节点名称 anonymous=True是让名称末尾添加随机数确保节点具有唯一名称
+  - `rate = rospy.Rate(10) # 10hz` 使用sleep方法按照规定速率循环
+  - `while not rospy.is_shutdown():`部分 标准的rospy结构 注意`rospy.loginfo(str)`会将消息打印到屏幕上 将消息写入节点的日志文件 写入rosout(可以通过rqt_console拉取信息查看相关的输出) `pub.publish(str)`广播信息
+  - 发布复杂的消息类型方法
+    - 先引入复杂消息类型 造函数参数的顺序与.msg文件中的顺序相同。也可以不传入任何参数，直接初始化字段`msg = String()` `msg.data = str`
+    - 自定义复杂消息在msg/filename.msg中定义然后在Cmakelists和package.xml文件中声明消息依赖 编译后使用
+
+  - `try:` 的部分 除了标准的Python __main__检查，它还会捕获一个rospy.ROSInterruptException异常，当按下Ctrl+C或节点因其他原因关闭时，这一异常就会被rospy.sleep()和rospy.Rate.sleep()抛出。引发此异常的原因是你不会意外地在sleep()之后继续执行代码。
+
+``` python
+#!/usr/bin/env python
+import rospy
+from std_msgs.msg import String
+
+def callback(data):
+    rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
+    
+def listener():
+
+    # In ROS, nodes are uniquely named. If two nodes with the same
+    # name are launched, the previous one is kicked off. The
+    # anonymous=True flag means that rospy will choose a unique
+    # name for our 'listener' node so that multiple listeners can
+    # run simultaneously.
+    rospy.init_node('listener', anonymous=True)
+
+    rospy.Subscriber("chatter", String, callback)
+
+    # spin() simply keeps python from exiting until this node is stopped
+    rospy.spin()
+
+if __name__ == '__main__':
+    listener()
+```
+
+- 解释:
+
+  - `rospy.spin()` 引入新的回调机制与roscpp不同rospy.spin()不影响订阅者回调函数有自己的线程
+- 记得`source ~/workspacename/devel/setup.bash`
+
+## service建立 python实现
+
+- 建立/srv `roscp rospy_tutorials AddTwoInts.srv srv/AddTwoInts.srv`
+- 在package.xml中修改服务字段 `<build_depend>message_generation</build_depend>` 和`<exec_depend>message_runtime</exec_depend>`添加
+- 在CmakeLists.txt中添加对应的srv`add_service_files( FILES .srv)`注意find_package中添加rospy
+
+```python
+#!/usr/bin/env python
+
+from __future__ import print_function
+
+from beginner_tutorials.srv import AddTwoInts,AddTwoIntsResponse #自己建立的包的名字下引入服务
+import rospy
+
+def handle_add_two_ints(req):
+    print("Returning [%s + %s = %s]"%(req.a, req.b, (req.a + req.b)))
+    return AddTwoIntsResponse(req.a + req.b)
+
+def add_two_ints_server():
+    rospy.init_node('add_two_ints_server')
+    s = rospy.Service('add_two_ints', AddTwoInts, handle_add_two_ints) //AddTwoInts是服务类型由现有包直接生成的
+    print("Ready to add two ints.")
+    rospy.spin()
+
+if __name__ == "__main__":
+    add_two_ints_server()
+```
+
+- 解释:
+
+  - 使用init_node()声明我们的节点，然后再声明我们的服务`s = rospy.Service('add_two_ints', AddTwoInts, handle_add_two_ints)`
+  - 声明了一个名为add_two_ints的新服务，其服务类型为AddTwoInts。所有的请求（request）都传递给了handle_add_two_ints函数。handle_add_two_ints被AddTwoIntsRequest的实例调用，返回AddTwoIntsResponse实例。建立了server对象
+
+```python
+#client
+#!/usr/bin/env python
+
+from __future__ import print_function
+
+import sys
+import rospy
+from beginner_tutorials.srv import * #从自己的功能包下引入
+
+def add_two_ints_client(x, y): #建立client需要传入两个参数
+    rospy.wait_for_service('add_two_ints')
+    try:
+        add_two_ints = rospy.ServiceProxy('add_two_ints', AddTwoInts) #服务的名字和服务的类型
+        resp1 = add_two_ints(x, y) #调用服务端 发送请求传入参数
+        return resp1.sum #将相应里的sum字段返回
+    except rospy.ServiceException as e:
+        print("Service call failed: %s"%e) #自检输出错误
+
+def usage():
+    return "%s [x y]"%sys.argv[0]
+
+if __name__ == "__main__":
+    if len(sys.argv) == 3:
+        x = int(sys.argv[1])
+        y = int(sys.argv[2])
+    else:
+        print(usage())
+        sys.exit(1)
+    print("Requesting %s+%s"%(x, y))
+    print("%s + %s = %s"%(x, y, add_two_ints_client(x, y)))
+```
+
+- 注意在CmakeLists中添加相应项目
+- find_package()与catkin_package():
+
+  - `find_package(catkin REQUIRED COMPONENTS ...)` 编译功能包时需要的依赖
+  - `catkin_package(...)` Catkin 打包 任务不是为了编译当前这个包，而是为了生成一些配置文件告诉别人提供的东西
+- 代码说明:
+
+  - 对于客户端来说不需要调用init_node() `rospy.wait_for_service('add_two_ints')` 让在add_two_ints服务可用之前一直阻塞。
+  - `add_two_ints = rospy.ServiceProxy('add_two_ints', AddTwoInts)` 建立客服端端口
+  - sys.argv 是一个 列表 (list)，存放了从命令行运行 Python 程序时传入的参数。在 sys 模块中定义，所以要先 import sys。
+
+## service C++实现
+
+- req 和 res 对象 req代表request res代表response从服务端传递参数
+- 添加/srv和.srv文件
+
+```C++
+#include "ros/ros.h"
+#include "beginner_tutorials/AddTwoInts.h"
+
+bool add(beginner_tutorials::AddTwoInts::Request  &req,
+         beginner_tutorials::AddTwoInts::Response &res)
+{
+  res.sum = req.a + req.b;
+  ROS_INFO("request: x=%ld, y=%ld", (long int)req.a, (long int)req.b);
+  ROS_INFO("sending back response: [%ld]", (long int)res.sum);
+  return true;
+}
+
+int main(int argc, char **argv)
+{
+  ros::init(argc, argv, "add_two_ints_server");
+  ros::NodeHandle n;
+
+  ros::ServiceServer service = n.advertiseService("add_two_ints", add);
+  ROS_INFO("Ready to add two ints.");
+  ros::spin();
+
+  return 0;
+}
+```
+
+- 解释:
+
+  - `#include "beginner_tutorials/AddTwoInts.h"`导入srv生成的头文件
+  - `bool add(beginner_tutorials::AddTwoInts::Request  &req, beginner_tutorials::AddTwoInts::Response &res)` 提供了AddTwoInts服务，它接受srv文件中定义的请求（request）和响应（response）类型，并返回一个布尔值。这是一个回调函数 用来处理请求返回的是调用的状态
+
+  ``` C++
+  {
+  res.sum = req.a + req.b;
+  ROS_INFO("request: x=%ld, y=%ld", (long int)req.a, (long int)req.b);
+  ROS_INFO("sending back response: [%ld]", (long int)res.sum);
+  return true;
+  }
+  ```
+
+  - 此处，两个整数被相加，和已经存储在了响应中。然后记录一些有关请求和响应的信息到日志中。完成后，服务返回true
+  - `ros::ServiceServer service = n.advertiseService("add_two_ints", add);` 监理服务宣告名为add_two_ints
+
+```C++
+#include "ros/ros.h"
+#include "beginner_tutorials/AddTwoInts.h"
+#include <cstdlib>
+
+int main(int argc, char **argv)
+{
+  ros::init(argc, argv, "add_two_ints_client");
+  if (argc != 3)
+  {
+    ROS_INFO("usage: add_two_ints_client X Y");
+    return 1;
+  }
+
+  ros::NodeHandle n;
+  ros::ServiceClient client = n.serviceClient<beginner_tutorials::AddTwoInts>("add_two_ints");
+  beginner_tutorials::AddTwoInts srv;
+  srv.request.a = atoll(argv[1]);
+  srv.request.b = atoll(argv[2]);
+  if (client.call(srv))
+  {
+    ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+  }
+  else
+  {
+    ROS_ERROR("Failed to call service add_two_ints");
+    return 1;
+  }
+
+  return 0;
+}
+```
+
+- 解释:
+
+  - `ros::ServiceClient client = n.serviceClient<beginner_tutorials::AddTwoInts>("add_two_ints");`建立一个client对象在稍后调用服务
+
+  ```C++
+   beginner_tutorials::AddTwoInts srv; //改为自己的功能包名
+   srv.request.a = atoll(argv[1]);
+   srv.request.b = atoll(argv[2]);
+  ```
+
+  - 实例化一个自动生成的服务类，并为它的request成员赋值。一个服务类包括2个成员变量：request和response，以及2个类定义：Request和Response。
+  - `if (client.call(srv))`此处实际上调用了服务。由于服务调用被阻塞，它将在调用完成后返回。如果服务调用成功，call()将返回true，并且srv.response中的值将是有效的。如果调用不成功，则call()将返回false且srv.response的值将不可用。
+
+- 在CmakeLists.txt下加入以下建立实例
+- 创建两个可执行文件add_two_ints_server和add_two_ints_client，默认情况下，它们将被放到软件包目录下的devel空间中，即`~/catkin_ws/devel/lib/<package name>`。你可以直接调用可执行文件，也可以使用rosrun来调用它们。它们没有被放在`<prefix>/bin`中，因为这样在将软件包安装到系统时会污染PATH环境变量。
+
+```txt
+add_executable(add_two_ints_server src/add_two_ints_server.cpp)
+target_link_libraries(add_two_ints_server ${catkin_LIBRARIES})
+add_dependencies(add_two_ints_server  ${PROJECT_NAME}_gencpp)
+
+add_executable(add_two_ints_client src/add_two_ints_client.cpp)
+target_link_libraries(add_two_ints_client ${catkin_LIBRARIES})
+add_dependencies(add_two_ints_client  ${PROJECT_NAME}_gencpp)
+```
