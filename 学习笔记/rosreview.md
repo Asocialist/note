@@ -211,7 +211,7 @@
 
  1. ros工具获取帮助 `rosmsg -h` `rosmsg show -h`
 
-## ros创建node cpp实现
+## ros创建node使用topic cpp实现
 
 - `catkin_create_pkg my_robot_driver roscpp std_msgs`建立基础环境
 - my_robot_driver是包的名称 std_msgs等是要用到的依赖
@@ -550,7 +550,7 @@ int main(int argc, char **argv)
 - `ros::Subscriber sub = n.subscribe("chatter", 1000, chatterCallback);`跟publisher一样建立一个subcriber 对象名为sub订阅chatter话题
 - `ros::spin();`启动一个自循环来不断调用回调函数
 
-## ros创建node python实现
+## ros创建node使用topic python实现
 
 - 同样建立一个publisher节点和一个subscriber节点
 - 代码要放在/packagename/script下 注意权限的添加
