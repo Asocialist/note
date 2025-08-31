@@ -34,7 +34,7 @@
 
 - 创建软件包
 
-  - 使用`catkin_create_pkg <packagename> [depend1] [depend2] [depend3]`来创建软件包
+  - 使用`catkin_create_pkg <packagename> [depend1] [depend2] [depend3]` `std_msgs rospy roscpp`来创建软件包
   - 会创建一个packagename的文件夹中包含 package.xml和CMAKEList.txt 部分填写了你在执行catkin_create_pkg命令时提供的信息
 
 - 在catkin工作区生效配置文件`cd ~/catkin_ws` `catkin build`
